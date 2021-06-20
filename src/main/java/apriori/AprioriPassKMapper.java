@@ -38,14 +38,14 @@ public class AprioriPassKMapper extends Mapper<LongWritable, Text, Text, IntWrit
 
     @Override
     public void setup(Context context) {
-        // Ignore this Complete
 
         int passNum = context.getConfiguration().getInt("passNum", 2);      // getInt(String name, int defaultValue) : Get the value of the name property as an int
-        String lastPassOutputFile = "output" + (passNum - 1) + "/part-r-00000";	
+        String outDir=context.getConfiguration().get("outPrefix");
+        String lastPassOutputFile = "pass" + (passNum - 1) + "/part-r-00000";
 
         // In try part, it reads the itemSet from the previous pass.
         try {
-            Path path = new Path(lastPassOutputFile);
+            Path path = new Path(outDir,lastPassOutputFile);
             FileSystem fs = FileSystem.get(context.getConfiguration());
             BufferedReader fis = new BufferedReader(new InputStreamReader(fs.open(path)));
             String currLine;
@@ -100,7 +100,7 @@ public class AprioriPassKMapper extends Mapper<LongWritable, Text, Text, IntWrit
     public void map(LongWritable key, Text txnRecord, Context context)
             throws IOException, InterruptedException {
         Transaction txn = AprioriUtils.getTransaction((int) key.get(), txnRecord.toString());
-        Collections.sort(txn); // Sort the transactions list
+//        Collections.sort(txn); // Sort the transactions list
         ArrayList<ItemSet> matchedItemSet = new ArrayList<>();
         trie.findItemSets(matchedItemSet, txn); // Find all the candidates matching with itemsets
         										// formed from subsets from a transaction

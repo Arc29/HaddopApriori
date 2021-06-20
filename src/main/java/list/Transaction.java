@@ -25,8 +25,12 @@ public class Transaction extends ArrayList<Integer>
 
 	@Override
 	public boolean add(Integer integer) {
-        super.add(integer);
-		Collections.sort(this);
+//        super.add(integer);
+//		Collections.sort(this);
+		int pos = Collections.binarySearch(this, integer);
+		if (pos < 0) {
+			super.add(-pos-1, integer);
+		}
 		return true;
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import list.Association;
 import list.ItemSet;
 import list.Transaction;
 
@@ -173,5 +174,48 @@ public class AprioriUtils
         	findSubSets(0, itemSet, subSets, taken, newItemSet); 
         }
         return subSets;
+    }
+
+    public static ArrayList<Association> generateRulesFromItemSet(ItemSet set,HashMap<ItemSet,Integer> supports , int numTxn){
+        ArrayList<Association> result=new ArrayList<>();
+        int len=set.size();
+        for(int i=1;i<len;i++){
+            for(int j=0;j<len-i+1;j++){
+                ItemSet set1=new ItemSet();
+                for(int k=j;k<j+i;k++)
+                    set1.add(set.get(k));
+                ItemSet set2=new ItemSet();
+                set2.addAll(set);
+                set2.subList(j, j+i).clear();
+                //X=>Y
+                result.add(new Association(set1,set2,false,false,set.getSupportCount(),supports.get(set1),supports.get(set2)));
+                //~X=>Y Supp(~X=>Y) = Supp(Y) - Supp(XUY)
+                result.add(new Association(set1,set2,true,false,supports.get(set2)-set.getSupportCount(),numTxn-supports.get(set1),supports.get(set2)));
+                //X=>~Y Supp(X=>~Y) = Supp(X) - Supp(XUY)
+                result.add(new Association(set1,set2,false,true,supports.get(set1)-set.getSupportCount(),supports.get(set1),numTxn-supports.get(set2)));
+                //~X=>~Y Supp(~X=>~Y) = 1 - Supp(X) - Supp(Y) + Supp(XUY)
+                result.add(new Association(set1,set2,true,true,numTxn-supports.get(set1)-supports.get(set2)+set.getSupportCount(),numTxn-supports.get(set1),numTxn-supports.get(set2)));
+            }
+        }
+        return result;
+    }
+
+    public static ItemSet getItemSet(String str){
+        str = str.replace("[", "");
+        str = str.replace("]", "");
+        str=str.trim();
+        String[] words = str.split("[\\s\\t]+");
+        String finalWord = words[words.length - 1];
+        int supp = Integer.parseInt(finalWord);
+        ItemSet set=new ItemSet(supp);
+
+        for (int k = 0; k < words.length - 1; k++) {
+            String csvItemIds = words[k];
+            String[] itemIds = csvItemIds.split(",");
+            for (String itemId : itemIds) {
+                set.add(Integer.parseInt(itemId));
+            }
+        }
+        return set;
     }
 }

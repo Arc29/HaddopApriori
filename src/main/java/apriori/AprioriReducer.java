@@ -30,6 +30,7 @@ public class AprioriReducer extends Reducer<Text, IntWritable, Text, IntWritable
         																// don't continue
         	return;
         }
+        context.getCounter(AprioriDriver.File.LINES_WRITTEN).increment(1);
         IntWritable result = new IntWritable();
         result.set(sum);
         context.write(itemSet, result); // form the result

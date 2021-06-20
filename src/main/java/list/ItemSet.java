@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemSet extends ArrayList<Integer> implements Comparable<ItemSet> {
-    int supportCount;
+    private int supportCount;
 
     public ItemSet() {
     }
@@ -59,5 +59,9 @@ public class ItemSet extends ArrayList<Integer> implements Comparable<ItemSet> {
             }
         }
         return 0;
+    }
+
+    public int getSupportCount() {
+        return supportCount;
     }
 }
